@@ -56,7 +56,12 @@ WHERE facid in (1,5)
 more than $100? Return the name and monthly maintenance of the facilities
 in question. */
 
-**what does it mean by "each labelled as ..."?
+SELECT name, monthlymaintenance, 
+CASE
+	WHEN monthlymaintenance > 100 THEN "expensive"
+	ELSE "cheap"
+END AS label
+FROM Facilities
 
 
 /* Q6: You'd like to get the first and last name of the last member(s)
@@ -102,15 +107,16 @@ ORDER BY Cost DESC
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
-SELECT F.name, CONCAT(M.firstname, M.surname) AS name,
+SELECT F.name, CONCAT(M.firstname, M.surname) AS name, 
 	CASE
 	WHEN B.memid = 0 THEN B.slots*F.guestcost
 	ELSE B.slots*F.membercost
 	END AS Cost
-FROM Bookings B JOIN Facilities F
+FROM (SELECT * FROM Bookings
+      WHERE starttime BETWEEN '2012-09-30 00:00:00' AND '2012-09-30 23:59:59')
+      B JOIN Facilities F
 ON B.facid = F.facid JOIN Members M
 ON B.memid = M.memid
-WHERE B.memid in (SELECT memid FROM Bookings WHERE starttime BETWEEN '2012-09-30 00:00:00' AND '2012-09-30 23:59:59')
 ORDER BY Cost DESC
 
 
